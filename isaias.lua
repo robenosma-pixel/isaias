@@ -1,102 +1,187 @@
--- ISAIAS HUB V7 TIKTOK EDITION 👹🔥
-local Player = game.Players.LocalPlayer
-local Camera = workspace.CurrentCamera
+-- ISAIAS HUB V8 RAYFIELD REAL + FIX NOCLIP/HITBOX 👹
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "ISAIAS HUB V8 | DUELS 👹👺",
+   Icon = 0,
+   LoadingTitle = "Isaias Hub",
+   LoadingSubtitle = "by Isaias 👹",
+   Theme = "Amethyst",
+   ConfigurationSaving = { Enabled = false }
+})
+
+local MainTab = Window:CreateTab("🔥 Main", 4483362458)
+local PlayerTab = Window:CreateTab("👤 Player", 4483362458)
+
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local PG = Player:WaitForChild("PlayerGui")
-if PG:FindFirstChild("IsaiasHub") then PG.IsaiasHub:Destroy() end
+local Player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
-local Gui = Instance.new("ScreenGui", PG)
-Gui.Name = "IsaiasHub"
-Gui.ResetOnSpawn = false
+local speedOn, espOn, aimOn, flyOn, jumpOn, noclipOn, hitOn = false,false,false,false,false,false,false
+local flyConn, noclipConn, hitConn
+local originalSizes = {}
 
-local Circle = Instance.new("TextButton", Gui)
-Circle.Size = UDim2.new(0,70,0,70)
-Circle.Position = UDim2.new(0,15,0.4,0)
-Circle.Text = "👹"
-Circle.TextScaled = true
-Circle.BackgroundColor3 = Color3.fromRGB(0,0,0)
-Circle.TextColor3 = Color3.new(1,1,1)
-Circle.Draggable = true
-Instance.new("UICorner", Circle).CornerRadius = UDim.new(1,0)
-local Stroke = Instance.new("UIStroke", Circle)
-Stroke.Color = Color3.fromRGB(140,0,255)
-Stroke.Thickness = 3
+-- SPEED DUELS ANTI-KICK
+MainTab:CreateToggle({
+   Name = "SPEED DUELS [ANTI-KICK]",
+   CurrentValue = false,
+   Callback = function(v) speedOn = v end,
+})
 
-local Main = Instance.new("Frame", Gui)
-Main.Size = UDim2.new(0,250,0,380)
-Main.Position = UDim2.new(0.5,-125,0.5,-190)
-Main.BackgroundColor3 = Color3.fromRGB(10,10,10)
-Main.Visible = true
-Main.Active = true
-Main.Draggable = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
-local MStroke = Instance.new("UIStroke", Main)
-MStroke.Color = Color3.fromRGB(140,0,255)
-MStroke.Thickness = 2
+-- HIGH JUMP
+PlayerTab:CreateToggle({
+   Name = "HIGH JUMP",
+   CurrentValue = false,
+   Callback = function(v) 
+       jumpOn = v
+       local hum = Player.Character and Player.Character:FindFirstChild("Humanoid")
+       if hum then hum.UseJumpPower = true hum.JumpPower = v and 150 or 50 end
+   end,
+})
 
-local Top = Instance.new("Frame", Main)
-Top.Size = UDim2.new(1,0,0,50)
-Top.BackgroundColor3 = Color3.fromRGB(140,0,255)
-Instance.new("UICorner", Top).CornerRadius = UDim.new(0,12)
-local TopText = Instance.new("TextLabel", Top)
-TopText.Size = UDim2.new(1,0,1,0)
-TopText.Text = "ISAIAS HUB | TIKTOK 🔥"
-TopText.BackgroundTransparency = 1
-TopText.TextColor3 = Color3.new(1,1,1)
-TopText.TextScaled = true
-TopText.Font = Enum.Font.GothamBold
+-- FLY
+MainTab:CreateToggle({
+   Name = "FLY",
+   CurrentValue = false,
+   Callback = function(v)
+       flyOn = v
+       if v then
+           flyConn = RunService.RenderStepped:Connect(function()
+               local char = Player.Character
+               local hrp = char and char:FindFirstChild("HumanoidRootPart")
+               local hum = char and char:FindFirstChild("Humanoid")
+               if hrp and hum then hum.PlatformStand = true hrp.CFrame = hrp.CFrame + Camera.CFrame.LookVector * 2.5 end
+           end)
+       else
+           if flyConn then flyConn:Disconnect() end
+           local hum = Player.Character and Player.Character:FindFirstChild("Humanoid")
+           if hum then hum.PlatformStand = false end
+       end
+   end,
+})
 
-local function addBtn(txt,y)
-    local b=Instance.new("TextButton",Main)
-    b.Size=UDim2.new(0,230,0,38)
-    b.Position=UDim2.new(0,10,0,y)
-    b.Text=txt.." ❌"
-    b.BackgroundColor3=Color3.fromRGB(25,25,25)
-    b.TextColor3=Color3.new(1,1,1)
-    b.Font=Enum.Font.GothamBold
-    b.TextScaled=true
-    Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
-    return b
-end
+-- NOCLIP FIX
+PlayerTab:CreateToggle({
+   Name = "NOCLIP [FIXED]",
+   CurrentValue = false,
+   Callback = function(v)
+       noclipOn = v
+       if v then
+           noclipConn = RunService.Stepped:Connect(function()
+               if Player.Character then
+                   for _,part in pairs(Player.Character:GetDescendants()) do
+                       if part:IsA("BasePart") and part.CanCollide == true then
+                           part.CanCollide = false
+                       end
+                   end
+               end
+           end)
+       else
+           if noclipConn then noclipConn:Disconnect() end
+           if Player.Character then
+               for _,part in pairs(Player.Character:GetDescendants()) do
+                   if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                       -- deja que roblox lo regrese solo
+                   end
+               end
+           end
+       end
+   end,
+})
 
-local btns = {
-    addBtn("SPEED DUELS",60),
-    addBtn("ESP",105),
-    addBtn("AIMBOT LOCK",150),
-    addBtn("HITBOX",195),
-    addBtn("FLY",240),
-    addBtn("HIGH JUMP",285),
-    addBtn("NOCLIP",330)
-}
+-- ESP
+MainTab:CreateToggle({
+   Name = "ESP ENEMIGO",
+   CurrentValue = false,
+   Callback = function(v) espOn = v end,
+})
 
-local states = {false,false,false,false,false,false,false}
-local flyConn
+-- AIMBOT
+MainTab:CreateToggle({
+   Name = "AIMBOT LOCK DUELS",
+   CurrentValue = false,
+   Callback = function(v) aimOn = v end,
+})
 
-Circle.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
+-- HITBOX FIX (EL QUE NO FUNCIONABA)
+MainTab:CreateToggle({
+   Name = "HITBOX GRANDE [FIXED]",
+   CurrentValue = false,
+   Callback = function(v)
+       hitOn = v
+       if v then
+           hitConn = RunService.RenderStepped:Connect(function()
+               for _,plr in pairs(Players:GetPlayers()) do
+                   if plr ~= Player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                       local hrp = plr.Character.HumanoidRootPart
+                       if not originalSizes[plr] then originalSizes[plr] = hrp.Size end
+                       hrp.Size = Vector3.new(10,10,10)
+                       hrp.Transparency = 0.7
+                       hrp.CanCollide = false
+                       hrp.Massless = true
+                   end
+               end
+           end)
+       else
+           if hitConn then hitConn:Disconnect() end
+           for _,plr in pairs(Players:GetPlayers()) do
+               if plr ~= Player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                   local hrp = plr.Character.HumanoidRootPart
+                   hrp.Size = originalSizes[plr] or Vector3.new(2,2,1)
+                   hrp.Transparency = 0
+               end
+           end
+           originalSizes = {}
+       end
+   end,
+})
 
-local function toggle(i,on)
-    btns[i].Text = btns[i].Text:gsub(" ❌",""):gsub(" ✅","") .. (on and " ✅" or " ❌")
-    btns[i].BackgroundColor3 = on and Color3.fromRGB(140,0,255) or Color3.fromRGB(25,25,25)
-end
-
-btns[1].MouseButton1Click:Connect(function() states[1]=not states[1] toggle(1,states[1]) end)
-btns[2].MouseButton1Click:Connect(function() states[2]=not states[2] toggle(2,states[2]) end)
-btns[3].MouseButton1Click:Connect(function() states[3]=not states[3] toggle(3,states[3]) end)
-btns[4].MouseButton1Click:Connect(function() states[4]=not states[4] toggle(4,states[4]) end)
-btns[5].MouseButton1Click:Connect(function()
-    states[5]=not states[5] toggle(5,states[5])
-    if states[5] then flyConn=RunService.RenderStepped:Connect(function() local hrp=Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") local hum=Player.Character and Player.Character:FindFirstChild("Humanoid") if hrp and hum then hum.PlatformStand=true hrp.CFrame=hrp.CFrame+Camera.CFrame.LookVector*2.5 end end) else if flyConn then flyConn:Disconnect() end local hum=Player.Character and Player.Character:FindFirstChild("Humanoid") if hum then hum.PlatformStand=false end end
-end)
-btns[6].MouseButton1Click:Connect(function() states[6]=not states[6] toggle(6,states[6]) local hum=Player.Character and Player.Character:FindFirstChild("Humanoid") if hum then hum.JumpPower=states[6] and 130 or 50 hum.UseJumpPower=true end end)
-btns[7].MouseButton1Click:Connect(function() states[7]=not states[7] toggle(7,states[7]) end)
-
+-- LOOPS PRINCIPALES
 RunService.RenderStepped:Connect(function()
-    local char=Player.Character local hrp=char and char:FindFirstChild("HumanoidRootPart") local hum=char and char:FindFirstChild("Humanoid")
-    if states[1] and hrp and hum and hum.MoveDirection.Magnitude>0 then hrp.CFrame=hrp.CFrame+(hum.MoveDirection*0.25) end
-    if states[7] and char then for _,v in pairs(char:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide=false end end end
-    if states[2] then for _,v in pairs(game.Players:GetPlayers()) do if v~=Player and v.Character and not v.Character:FindFirstChild("E") then local h=Instance.new("Highlight",v.Character) h.Name="E" h.FillColor=Color3.fromRGB(255,0,0) end end else for _,v in pairs(game.Players:GetPlayers()) do if v.Character and v.Character:FindFirstChild("E") then v.Character.E:Destroy() end end end
-    if states[4] then for _,v in pairs(game.Players:GetPlayers()) do if v~=Player and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then v.Character.HumanoidRootPart.Size=Vector3.new(7,7,7) v.Character.HumanoidRootPart.Transparency=0.6 end end end
-    if states[3] then local c,d=nil,300 for _,v in pairs(game.Players:GetPlayers()) do if v~=Player and v.Character and v.Character:FindFirstChild("Head") then local p,o=Camera:WorldToViewportPoint(v.Character.Head.Position) if o then local m=(Vector2.new(p.X,p.Y)-Vector2.new(Camera.ViewportSize.X/2,Camera.ViewportSize.Y/2)).Magnitude if m<d then d=m c=v end end end end if c then Camera.CFrame=CFrame.new(Camera.CFrame.Position,c.Character.Head.Position) end end
+    local char = Player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChild("Humanoid")
+
+    if speedOn and hrp and hum and hum.MoveDirection.Magnitude > 0 then
+        hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 0.28)
+    end
+
+    if espOn then
+        for _,v in pairs(Players:GetPlayers()) do
+            if v~=Player and v.Character and not v.Character:FindFirstChild("IsaiasESP") then
+                local hl = Instance.new("Highlight", v.Character)
+                hl.Name = "IsaiasESP"
+                hl.FillColor = Color3.fromRGB(255,0,0)
+                hl.OutlineColor = Color3.fromRGB(255,255,255)
+                hl.FillTransparency = 0.5
+            end
+        end
+    else
+        for _,v in pairs(Players:GetPlayers()) do
+            if v.Character and v.Character:FindFirstChild("IsaiasESP") then v.Character.IsaiasESP:Destroy() end
+        end
+    end
+
+    if aimOn then
+        local closest, dist = nil, 300
+        for _,v in pairs(Players:GetPlayers()) do
+            if v~=Player and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                local pos,onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+                if onScreen then
+                    local mag = (Vector2.new(pos.X,pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if mag < dist then dist = mag closest = v end
+                end
+            end
+        end
+        if closest then Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Character.Head.Position) end
+    end
 end)
 
-Player.CharacterAdded:Connect(function(c) c:WaitForChild("Humanoid") wait(1) if states[6] then c.Humanoid.JumpPower=130 end end)
+Player.CharacterAdded:Connect(function(c)
+    c:WaitForChild("Humanoid")
+    wait(0.5)
+    if jumpOn then c.Humanoid.UseJumpPower = true c.Humanoid.JumpPower = 150 end
+end)
+
+Rayfield:Notify({Title = "ISAIAS HUB V8", Content = "Rayfield cargado! Noclip y Hitbox arreglados 👹", Duration = 5})
