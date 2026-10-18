@@ -1,108 +1,110 @@
--- ISAIAS HUB V10 FINAL BY DELTERO Y EDER - TODO FIX + SNAP ROJO
-local Player = game:GetService("Players").LocalPlayer
+-- ISAIAS HUB V10 ULTRA FIX - BY DELTERO Y EDER - CARGA 100%
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 local PG = Player:WaitForChild("PlayerGui")
-for _,v in pairs(PG:GetChildren()) do if v.Name=="IsaiasCredit" or v.Name=="Rayfield" or v.Name=="SnapBtnGui" then v:Destroy() end end
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
 
--- LETRERO BY DELTERO Y EDER
-local CreditGui = Instance.new("ScreenGui", PG)
-CreditGui.Name = "IsaiasCredit"
-CreditGui.ResetOnSpawn = false
-local CreditLabel = Instance.new("TextLabel", CreditGui)
-CreditLabel.Size = UDim2.new(0,400,0,80)
-CreditLabel.Position = UDim2.new(0.5,-200,0.15,0)
-CreditLabel.BackgroundColor3 = Color3.fromRGB(0,0,0)
-CreditLabel.Text = "BY DELTERO Y EDER 👹🔥"
-CreditLabel.TextColor3 = Color3.fromRGB(255,0,0)
-CreditLabel.TextScaled = true
-CreditLabel.Font = Enum.Font.GothamBlack
-Instance.new("UICorner", CreditLabel).CornerRadius = UDim.new(0,12)
-Instance.new("UIStroke", CreditLabel).Color = Color3.new(1,1,1)
-game:GetService("Debris"):AddItem(CreditLabel, 5)
-game:GetService("Debris"):AddItem(CreditGui, 6)
+for _,v in pairs(PG:GetChildren()) do if v.Name=="IsaiasHubV10" then v:Destroy() end end
+
+local Gui = Instance.new("ScreenGui", PG)
+Gui.Name = "IsaiasHubV10"
+Gui.ResetOnSpawn = false
+
+-- BY DELTERO Y EDER ARRIBA
+local Credit = Instance.new("TextLabel", Gui)
+Credit.Size = UDim2.new(0,350,0,50)
+Credit.Position = UDim2.new(0.5,-175,0,10)
+Credit.Text = "BY DELTERO Y EDER 👹🔥"
+Credit.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Credit.TextColor3 = Color3.fromRGB(255,0,0)
+Credit.TextScaled = true
+Credit.Font = Enum.Font.GothamBlack
+Instance.new("UICorner", Credit).CornerRadius = UDim.new(0,10)
+Instance.new("UIStroke", Credit).Color = Color3.fromRGB(140,0,255)
+Credit.Parent = Gui
 
 -- BOTON ROJO SNAP MOVIBLE
-local SnapGui = Instance.new("ScreenGui", PG)
-SnapGui.Name = "SnapBtnGui"
-SnapGui.ResetOnSpawn = false
-
-local SnapBtn = Instance.new("TextButton", SnapGui)
-SnapBtn.Size = UDim2.new(0,90,0,90)
-SnapBtn.Position = UDim2.new(0,20,0.6,0)
+local SnapBtn = Instance.new("TextButton", Gui)
+SnapBtn.Size = UDim2.new(0,80,0,80)
+SnapBtn.Position = UDim2.new(0,20,0.55,0)
 SnapBtn.Text = "SNAP"
-SnapBtn.TextScaled = true
-SnapBtn.Font = Enum.Font.GothamBlack
 SnapBtn.BackgroundColor3 = Color3.fromRGB(255,0,0)
 SnapBtn.TextColor3 = Color3.new(1,1,1)
+SnapBtn.TextScaled = true
+SnapBtn.Font = Enum.Font.GothamBlack
 SnapBtn.Draggable = true
 SnapBtn.Active = true
 Instance.new("UICorner", SnapBtn).CornerRadius = UDim.new(1,0)
-local SStroke = Instance.new("UIStroke", SnapBtn)
-SStroke.Color = Color3.fromRGB(255,255,255)
-SStroke.Thickness = 3
+Instance.new("UIStroke", SnapBtn).Color = Color3.new(1,1,1)
 
 local snapUnder = false
 local savedPos = nil
 SnapBtn.MouseButton1Click:Connect(function()
-    local char = Player.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
     if not snapUnder then
         savedPos = hrp.CFrame
-        hrp.CFrame = hrp.CFrame - Vector3.new(0,25,0)
+        hrp.CFrame = CFrame.new(hrp.Position - Vector3.new(0,25,0))
         SnapBtn.Text = "UP"
         SnapBtn.BackgroundColor3 = Color3.fromRGB(0,255,0)
         snapUnder = true
     else
-        if savedPos then hrp.CFrame = savedPos + Vector3.new(0,5,0) else hrp.CFrame = hrp.CFrame + Vector3.new(0,30,0) end
+        hrp.CFrame = savedPos and savedPos + Vector3.new(0,5,0) or CFrame.new(hrp.Position + Vector3.new(0,30,0))
         SnapBtn.Text = "SNAP"
         SnapBtn.BackgroundColor3 = Color3.fromRGB(255,0,0)
         snapUnder = false
     end
 end)
 
--- RAYFIELD
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- MENU PRINCIPAL
+local Main = Instance.new("Frame", Gui)
+Main.Size = UDim2.new(0,260,0,440)
+Main.Position = UDim2.new(0.5,-130,0.5,-180)
+Main.BackgroundColor3 = Color3.fromRGB(15,15,15)
+Main.Active = true
+Main.Draggable = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
+Instance.new("UIStroke", Main).Color = Color3.fromRGB(140,0,255)
 
-local Window = Rayfield:CreateWindow({
-   Name = "ISAIAS HUB V10 | BY DELTERO Y EDER 👹",
-   Icon = 0,
-   LoadingTitle = "BY DELTERO Y EDER",
-   LoadingSubtitle = "V10 FIX TOTAL",
-   Theme = "Amethyst",
-   ConfigurationSaving = { Enabled = false }
-})
+local Top = Instance.new("TextLabel", Main)
+Top.Size = UDim2.new(1,0,0,40)
+Top.Text = "ISAIAS HUB V10 | DELTERO Y EDER"
+Top.BackgroundColor3 = Color3.fromRGB(140,0,255)
+Top.TextColor3 = Color3.new(1,1,1)
+Top.TextScaled = true
+Top.Font = Enum.Font.GothamBold
+Instance.new("UICorner", Top).CornerRadius = UDim.new(0,12)
 
-local MainTab = Window:CreateTab("🔥 Main", 4483362458)
-local PlayerTab = Window:CreateTab("👤 Player", 4483362458)
-local TPTab = Window:CreateTab("🚀 Teleport", 4483362458)
-local CreditTab = Window:CreateTab("👑 BY DELTERO Y EDER", 4483362458)
+local function newBtn(txt,y)
+    local b=Instance.new("TextButton",Main)
+    b.Size=UDim2.new(0,240,0,35)
+    b.Position=UDim2.new(0,10,0,y)
+    b.Text=txt.." ❌"
+    b.BackgroundColor3=Color3.fromRGB(30,30,30)
+    b.TextColor3=Color3.new(1,1,1)
+    b.Font=Enum.Font.GothamBold
+    b.TextScaled=true
+    Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
+    return b
+end
 
-CreditTab:CreateParagraph({Title = "CREADORES", Content = "🔥 DELTERO\n🔥 EDER\n\nBOTON ROJO SNAP = BAJO MAPA"})
+local b1=newBtn("SPEED DUELS",50)
+local b2=newBtn("ESP",90)
+local b3=newBtn("AIMBOT LOCK",130)
+local b4=newBtn("HITBOX GRANDE",170)
+local b5=newBtn("FLY",210)
+local b6=newBtn("HIGH JUMP",250)
+local b7=newBtn("NOCLIP",290)
+local b8=newBtn("INVISIBLE",330)
+local b9=newBtn("TP A JUGADOR RANDOM",370)
+local b10=newBtn("ABRIR/CERRAR MENU",410)
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local speedOn, espOn, aimOn, flyOn, jumpOn, noclipOn, hitOn = false,false,false,false,false,false,false
-local flyConn, noclipConn, hitConn
-local originalSizes = {}
+local s={false,false,false,false,false,false,false,false}
+local flyConn,noclipConn,hitConn
 
--- TP FIX
-local selectedPlayer = nil
-local Dropdown = TPTab:CreateDropdown({
-   Name = "Jugador a teletransportar",
-   Options = (function() local l={} for _,p in pairs(Players:GetPlayers()) do if p~=Player then table.insert(l,p.Name) end end return l end)(),
-   CurrentOption = "",
-   Flag = "TPDropdown",
-   Callback = function(opt) selectedPlayer = opt[1] print("Seleccionado: "..selectedPlayer) end,
-})
+local function tog(btn,on) btn.Text=btn.Text:gsub(" ❌",""):gsub(" ✅","")..(on and " ✅" or " ❌") btn.BackgroundColor3=on and Color3.fromRGB(140,0,255) or Color3.fromRGB(30,30,30) end
 
-TPTab:CreateButton({
-   Name = "🚀 TELETRANSPORTARME AHORA",
-   Callback = function()
-       if not selectedPlayer then Rayfield:Notify({Title="Error",Content="Selecciona jugador primero",Duration=3}) return end
-       local target = Players:FindFirstChild(selectedPlayer)
-       if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-           local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-           if hrp then
-               hrp.CFrame = CFrame.new(target.Character.HumanoidRootPart.Position + Vector3.new(0,3,2))
-               Rayfield:Notify({Title="TP",Content="TP a "..
+b1.MouseButton1Click:Connect(function() s[1]=not s[1] tog(b1,s[1]) end)
+b2.MouseButton1Click:Connect(function() s[2]=not s[2] tog(b2,s[2]) end)
+b3.MouseButton1Click:Connect(function() s[3]=not s[3] tog(b3
