@@ -1,63 +1,136 @@
--- ISAIAS HUB FIX 👹👺
+-- ISAIAS HUB V3 FIX 👹👺
 local Player = game.Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local UserInputService = game:GetService("UserInputService")
+
 local GuiParent = Player:WaitForChild("PlayerGui")
+if GuiParent:FindFirstChild("IsaiasHub") then GuiParent.IsaiasHub:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui", GuiParent)
 ScreenGui.Name = "IsaiasHub"
 ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 220, 0, 280)
-Frame.Position = UDim2.new(0, 50, 0, 100)
+Frame.Size = UDim2.new(0, 200, 0, 210)
+Frame.Position = UDim2.new(0, 20, 0, 100)
 Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
 Frame.BorderSizePixel = 0
 Frame.Active = true
 Frame.Draggable = true
 
 local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1,0,0,40)
-Title.Text = "ISAIAS HUB 👹👺"
+Title.Size = UDim2.new(1,0,0,30)
+Title.Text = "ISAIAS HUB 👹👺 V3"
 Title.TextColor3 = Color3.new(1,1,1)
 Title.BackgroundColor3 = Color3.fromRGB(140,0,255)
 Title.TextScaled = true
 
-local function createButton(name, pos, callback)
+local speedOn, espOn, flyOn, aimOn = false, false, false, false
+local flyBV, flyBG
+
+local function createButton(name, pos)
     local btn = Instance.new("TextButton", Frame)
-    btn.Size = UDim2.new(0, 200, 0, 40)
+    btn.Size = UDim2.new(0, 180, 0, 35)
     btn.Position = UDim2.new(0, 10, 0, pos)
     btn.Text = name
     btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
     btn.TextColor3 = Color3.new(1,1,1)
     btn.TextScaled = true
-    btn.MouseButton1Click:Connect(callback)
     return btn
 end
 
-createButton("SPEED: 100", 50, function()
+local speedBtn = createButton("SPEED: OFF", 40)
+local espBtn = createButton("ESP: OFF", 80)
+local flyBtn = createButton("FLY: OFF", 120)
+local aimBtn = createButton("AIMBOT: OFF", 160)
+
+speedBtn.MouseButton1Click:Connect(function()
+    speedOn = not speedOn
     local hum = Player.Character and Player.Character:FindFirstChild("Humanoid")
-    if hum then hum.WalkSpeed = 100 end
+    if hum then
+        hum.WalkSpeed = speedOn and 100 or 16
+        speedBtn.Text = speedOn and "SPEED: ON" or "SPEED: OFF"
+        speedBtn.BackgroundColor3 = speedOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
+    end
 end)
 
-createButton("ESP: ON", 100, function()
+espBtn.MouseButton1Click:Connect(function()
+    espOn = not espOn
+    espBtn.Text = espOn and "ESP: ON" or "ESP: OFF"
+    espBtn.BackgroundColor3 = espOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
     for _,v in pairs(game.Players:GetPlayers()) do
         if v ~= Player and v.Character and v.Character:FindFirstChild("Head") then
-            if not v.Character.Head:FindFirstChild("IsaiasESP") then
-                local box = Instance.new("BoxHandleAdornment", v.Character.Head)
-                box.Name = "IsaiasESP"
-                box.Adornee = v.Character.Head
-                box.Size = Vector3.new(2,2,2)
-                box.Color3 = Color3.fromRGB(255,0,0)
-                box.AlwaysOnTop = true
-                box.ZIndex = 10
+            if espOn then
+                if not v.Character:FindFirstChild("IsaiasESP") then
+                    local hl = Instance.new("Highlight", v.Character)
+                    hl.Name = "IsaiasESP"
+                    hl.FillColor = Color3.fromRGB(255,0,0)
+                end
+            else
+                if v.Character:FindFirstChild("IsaiasESP") then v.Character.IsaiasESP:Destroy() end
             end
         end
     end
 end)
 
-createButton("FLY", 150, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGui/main/FlyGui.lua"))() 
+flyBtn.MouseButton1Click:Connect(function()
+    flyOn = not flyOn
+    flyBtn.Text = flyOn and "FLY: ON" or "FLY: OFF"
+    flyBtn.BackgroundColor3 = flyOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
+    local char = Player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if flyOn then
+        flyBG = Instance.new("BodyGyro", hrp)
+        flyBG.P = 9e4
+        flyBG.MaxTorque = Vector3.new(9e9,9e9,9e9)
+        flyBG.CFrame = hrp.CFrame
+        flyBV = Instance.new("BodyVelocity", hrp)
+        flyBV.Velocity = Vector3.new(0,0,0)
+        flyBV.MaxForce = Vector3.new(9e9,9e9,9e9)
+        spawn(function()
+            while flyOn and char and char:FindFirstChild("HumanoidRootPart") do
+                local hum = char:FindFirstChild("Humanoid")
+                if hum then
+                    local move = hum.MoveDirection
+                    flyBV.Velocity = (move * 80) + Vector3.new(0,2,0)
+                    flyBG.CFrame = Camera.CFrame
+                end
+                wait()
+            end
+        end)
+    else
+        if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity:Destroy() end
+        if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro:Destroy() end
+        if flyBV then flyBV:Destroy() end
+        if flyBG then flyBG:Destroy() end
+    end
 end)
 
-createButton("AIMBOT", 200, function()
-    print("Aimbot Isaías")
+aimBtn.MouseButton1Click:Connect(function()
+    aimOn = not aimOn
+    aimBtn.Text = aimOn and "AIMBOT: ON" or "AIMBOT: OFF"
+    aimBtn.BackgroundColor3 = aimOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
+end)
+
+-- Aimbot Loop
+game:GetService("RunService").RenderStepped:Connect(function()
+    if aimOn then
+        local closest, dist = nil, 9999
+        for _,v in pairs(game.Players:GetPlayers()) do
+            if v ~= Player and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+                if onScreen then
+                    local mag = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if mag < dist then
+                        dist = mag
+                        closest = v
+                    end
+                end
+            end
+        end
+        if closest and closest.Character and closest.Character:FindFirstChild("Head") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Character.Head.Position)
+        end
+    end
 end)
