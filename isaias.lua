@@ -1,7 +1,7 @@
--- ISAIAS HUB V3 FIX 👹👺
+-- ISAIAS HUB V4 ANTI-CHEAT + FLY REAL 👹👺
 local Player = game.Players.LocalPlayer
 local Camera = workspace.CurrentCamera
-local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local GuiParent = Player:WaitForChild("PlayerGui")
 if GuiParent:FindFirstChild("IsaiasHub") then GuiParent.IsaiasHub:Destroy() end
@@ -20,13 +20,12 @@ Frame.Draggable = true
 
 local Title = Instance.new("TextLabel", Frame)
 Title.Size = UDim2.new(1,0,0,30)
-Title.Text = "ISAIAS HUB 👹👺 V3"
+Title.Text = "ISAIAS HUB V4 👹👺"
 Title.TextColor3 = Color3.new(1,1,1)
 Title.BackgroundColor3 = Color3.fromRGB(140,0,255)
 Title.TextScaled = true
 
 local speedOn, espOn, flyOn, aimOn = false, false, false, false
-local flyBV, flyBG
 
 local function createButton(name, pos)
     local btn = Instance.new("TextButton", Frame)
@@ -44,14 +43,24 @@ local espBtn = createButton("ESP: OFF", 80)
 local flyBtn = createButton("FLY: OFF", 120)
 local aimBtn = createButton("AIMBOT: OFF", 160)
 
+-- SPEED BYPASS (No usa WalkSpeed, usa CFrame para que no te regrese)
+spawn(function()
+    while wait() do
+        if speedOn then
+            local char = Player.Character
+            local hum = char and char:FindFirstChild("Humanoid")
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hum and hrp and hum.MoveDirection.Magnitude > 0 then
+                hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 2.5) -- Corre rápido sin ser detectado
+            end
+        end
+    end
+end)
+
 speedBtn.MouseButton1Click:Connect(function()
     speedOn = not speedOn
-    local hum = Player.Character and Player.Character:FindFirstChild("Humanoid")
-    if hum then
-        hum.WalkSpeed = speedOn and 100 or 16
-        speedBtn.Text = speedOn and "SPEED: ON" or "SPEED: OFF"
-        speedBtn.BackgroundColor3 = speedOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
-    end
+    speedBtn.Text = speedOn and "SPEED: ON" or "SPEED: OFF"
+    speedBtn.BackgroundColor3 = speedOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
 end)
 
 espBtn.MouseButton1Click:Connect(function()
@@ -59,7 +68,7 @@ espBtn.MouseButton1Click:Connect(function()
     espBtn.Text = espOn and "ESP: ON" or "ESP: OFF"
     espBtn.BackgroundColor3 = espOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
     for _,v in pairs(game.Players:GetPlayers()) do
-        if v ~= Player and v.Character and v.Character:FindFirstChild("Head") then
+        if v ~= Player and v.Character then
             if espOn then
                 if not v.Character:FindFirstChild("IsaiasESP") then
                     local hl = Instance.new("Highlight", v.Character)
@@ -73,37 +82,33 @@ espBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- FLY REAL QUE SI VUELA (para celular)
+local flyConn
 flyBtn.MouseButton1Click:Connect(function()
     flyOn = not flyOn
     flyBtn.Text = flyOn and "FLY: ON" or "FLY: OFF"
     flyBtn.BackgroundColor3 = flyOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
-    local char = Player.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
     if flyOn then
-        flyBG = Instance.new("BodyGyro", hrp)
-        flyBG.P = 9e4
-        flyBG.MaxTorque = Vector3.new(9e9,9e9,9e9)
-        flyBG.CFrame = hrp.CFrame
-        flyBV = Instance.new("BodyVelocity", hrp)
-        flyBV.Velocity = Vector3.new(0,0,0)
-        flyBV.MaxForce = Vector3.new(9e9,9e9,9e9)
-        spawn(function()
-            while flyOn and char and char:FindFirstChild("HumanoidRootPart") do
-                local hum = char:FindFirstChild("Humanoid")
-                if hum then
-                    local move = hum.MoveDirection
-                    flyBV.Velocity = (move * 80) + Vector3.new(0,2,0)
-                    flyBG.CFrame = Camera.CFrame
+        flyConn = RunService.RenderStepped:Connect(function()
+            local char = Player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local hum = char and char:FindFirstChild("Humanoid")
+            if hrp and hum then
+                hum.PlatformStand = true
+                -- Si mueves el joystick vuela hacia donde miras
+                if hum.MoveDirection.Magnitude > 0 then
+                    hrp.CFrame = hrp.CFrame + (Camera.CFrame.LookVector * 2.5)
+                else
+                    -- Si no te mueves, te quedas flotando en el aire
+                    hrp.CFrame = hrp.CFrame + Vector3.new(0,0.1,0)
                 end
-                wait()
             end
         end)
     else
-        if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity:Destroy() end
-        if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro:Destroy() end
-        if flyBV then flyBV:Destroy() end
-        if flyBG then flyBG:Destroy() end
+        if flyConn then flyConn:Disconnect() end
+        local char = Player.Character
+        local hum = char and char:FindFirstChild("Humanoid")
+        if hum then hum.PlatformStand = false end
     end
 end)
 
@@ -113,8 +118,7 @@ aimBtn.MouseButton1Click:Connect(function()
     aimBtn.BackgroundColor3 = aimOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(40,40,40)
 end)
 
--- Aimbot Loop
-game:GetService("RunService").RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if aimOn then
         local closest, dist = nil, 9999
         for _,v in pairs(game.Players:GetPlayers()) do
@@ -122,10 +126,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
                 if onScreen then
                     local mag = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
-                    if mag < dist then
-                        dist = mag
-                        closest = v
-                    end
+                    if mag < dist then dist = mag closest = v end
                 end
             end
         end
