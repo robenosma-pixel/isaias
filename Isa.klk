@@ -1,47 +1,27 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- ISAIAS ULTIMATE - ESP + AIMBOT VIS CHECK + SPEED + NOCLIP + INF JUMP + FLY
+-- Pon este archivo como main.lua en tu GitHub
 
-local Window = Rayfield:CreateWindow({
-   Name = "MIO HUB V7 - Rayfield",
-   LoadingTitle = "MIO HUB V7",
-   ConfigurationSaving = { Enabled = false }
-})
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
--- AIMBOT SIN FOV
-local Tab1 = Window:CreateTab("Aimbot", 4483362458)
-local aimbotEnabled = false
-local aimbotPart = "Head"
-Tab1:CreateToggle({Name = "Aimbot Sin FOV", CurrentValue = false, Callback = function(v) aimbotEnabled = v end,})
-Tab1:CreateDropdown({Name = "Parte", Options = {"Head","HumanoidRootPart"}, CurrentOption = "Head", Callback = function(o) aimbotPart = o[1] end,})
+getgenv().Settings = {
+    ESP = true,
+    Aimbot = true,
+    AimbotKey = Enum.UserInputType.MouseButton2, -- click derecho
+    TeamCheck = true,
+    Speed = 35,
+    FlySpeed = 50,
+    Noclip = false,
+    InfJump = false,
+    Fly = false
+}
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    if aimbotEnabled then
-        local closest, dist = nil, math.huge
-        for _,v in pairs(game.Players:GetPlayers()) do
-            if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild(aimbotPart) then
-                local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(v.Character[aimbotPart].Position)
-                if onScreen then
-                    local mag = (Vector2.new(pos.X,pos.Y) - Vector2.new(game.Players.LocalPlayer:GetMouse().X, game.Players.LocalPlayer:GetMouse().Y)).Magnitude
-                    if mag < dist then dist = mag closest = v end
-                end
-            end
-        end
-        if closest and closest.Character:FindFirstChild(aimbotPart) then
-            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, closest.Character[aimbotPart].Position)
-        end
-    end
-end)
-
--- ESP
-local Tab2 = Window:CreateTab("ESP", 4483362458)
-local espEnabled = false
-Tab2:CreateToggle({
-   Name = "ESP Jugadores",
-   CurrentValue = false,
-   Callback = function(v)
-       espEnabled = v
-       for _,p in pairs(game.Players:GetPlayers()) do
-           if p ~= game.Players.LocalPlayer and p.Character then
-               if v then
-                   if not p.Character:FindFirstChild("MioESP") then
-                       local hl = Instance.new("Highlight")
-                       hl.Name =
+-- FUNCION: ESTA DETRAS DE PARED?
+local function IsVisible(targetPart)
+    local origin = Camera.CFrame.Position
+    local direction = (targetPart.Position - origin)
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, targetPart.Parent
